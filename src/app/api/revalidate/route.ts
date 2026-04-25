@@ -31,11 +31,11 @@ export async function POST(request: NextRequest) {
     const documentType: string = body?._type || "";
 
     if (documentType && VALID_TAGS.includes(documentType)) {
-      revalidateTag(documentType, "max");
+      revalidateTag(documentType);
       console.log(`✅ Revalidated tag: ${documentType}`);
     } else {
       // Revalidate everything if we don't know the type
-      VALID_TAGS.forEach((tag) => revalidateTag(tag, "max"));
+      VALID_TAGS.forEach((tag) => revalidateTag(tag));
       console.log("✅ Revalidated all tags");
     }
 
