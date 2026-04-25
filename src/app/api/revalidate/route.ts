@@ -1,4 +1,4 @@
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 const VALID_TAGS = [
@@ -18,7 +18,6 @@ const VALID_TAGS = [
 export async function POST(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get("secret");
 
-  // Validate secret
   if (secret !== process.env.SANITY_REVALIDATE_SECRET) {
     return NextResponse.json(
       { message: "Invalid secret token" },
@@ -34,10 +33,13 @@ export async function POST(request: NextRequest) {
       revalidateTag(documentType);
       console.log(`✅ Revalidated tag: ${documentType}`);
     } else {
-      // Revalidate everything if we don't know the type
       VALID_TAGS.forEach((tag) => revalidateTag(tag));
       console.log("✅ Revalidated all tags");
     }
+
+    // Revalidar rutas principales también
+    revalidatePath("/");
+    revalidatePath("/servicios/[slug]", "page");
 
     return NextResponse.json({
       revalidated: true,
